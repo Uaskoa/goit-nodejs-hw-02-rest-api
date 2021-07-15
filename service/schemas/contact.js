@@ -22,10 +22,6 @@ const contactSchema = Schema(
 );
 
 const Contact = model('contact', contactSchema);
-// console.log(Contact);
-// console.log(contactSchema);
 
 module.exports = Contact;
 
-
-//почему не обрабатывает ошибку??? 

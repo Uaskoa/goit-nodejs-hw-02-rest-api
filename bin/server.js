@@ -1,18 +1,23 @@
-// const app = require('../app');
+const app = require('../app');
+const mongoose = require('mongoose');
+const dotenv = require('dotenv');
+dotenv.config();
 
 // const PORT = DB_HOST || 3000;
 
-// app.listen(PORT, () => {
-//   console.log(`Server running. Use our API on port: ${PORT}`);
-// });
+const { DB_HOST, PORT = 3000 } = process.env;
 
-// const app = require('../app')
-
-// const PORT = process.env.PORT || 3000
-
-// app.listen(PORT, () => {
-//   console.log(`Server running. Use our API on port: ${PORT}`)
-// })
-
-// "start": "cross-env NODE_ENV=production node ./bin/server.js",
-//   "start:dev": "cross-env NODE_ENV=development nodemon ./bin/server.js",
+mongoose
+  .connect(DB_HOST, {
+    useNewUrlParser: true,
+    useCreateIndex: true,
+    useUnifiedTopology: true,
+  })
+  .then(async () => {
+    app.listen(PORT);
+    console.log('Database connection successful');
+  })
+  .catch(error => {
+    console.log(error);
+    return process.exit(1);
+  });
