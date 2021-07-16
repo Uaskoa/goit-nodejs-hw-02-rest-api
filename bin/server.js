@@ -3,8 +3,6 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 dotenv.config();
 
-// const PORT = DB_HOST || 3000;
-
 const { DB_HOST, PORT = 3000 } = process.env;
 
 mongoose

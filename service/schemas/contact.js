@@ -1,4 +1,5 @@
 const { Schema, model } = require('mongoose');
+const Joi = require('joi');
 
 const contactSchema = Schema(
   {
@@ -23,5 +24,29 @@ const contactSchema = Schema(
 
 const Contact = model('contact', contactSchema);
 
-module.exports = Contact;
+const validateContact = newContact => {
+  const schema = Joi.object({
+    name: Joi.string().min(2).required(),
+    email: Joi.string().email().required(),
+    phone: Joi.string().min(2).required(),
+  });
+  const { error } = schema.validate(newContact);
+  return error;
+};
 
+const contactValidateMiddleware = (req, res, next) => {
+  const error = validateContact(req.body);
+  if (error) {
+    return res.status(400).json({
+      status: 'error',
+      code: 400,
+      message: error.message,
+    });
+  }
+  next();
+};
+
+module.exports = {
+  Contact,
+  contactValidateMiddleware,
+};

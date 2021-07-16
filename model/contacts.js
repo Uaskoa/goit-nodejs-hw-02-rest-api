@@ -1,7 +1,4 @@
-const { Contact } = require('../service/schemas/contact');
 const service = require('../service');
-
-// const { updateContactsJson, contactScheme } = require('./helpers');
 
 const listContacts = async (req, res, next) => {
   try {
@@ -87,31 +84,9 @@ const addContact = async (req, res, next) => {
   }
 };
 
-// const addContact = async (req, res) => {
-//   const { error } = contactScheme.validate(req.body);
-//   if (error) {
-//     await res.status(400).json({
-//       status: 'error',
-//       code: 400,
-//       message: error.message,
-//     });
-//   }
-//   const newContact = { ...req.body };
-//   contacts.push(newContact);
-
-//   await res.status(201).json({
-//     status: 'success',
-//     code: 201,
-//     data: {
-//       result: newContact,
-//     },
-//   });
-//   updateContactsJson(contacts);
-// };
-
 const updateContact = async (req, res, next) => {
   const { contactId } = req.params;
- 
+
   try {
     const result = await service.update(contactId, { ...req.body });
     if (Object.keys(req.body).length === 0) {
@@ -144,9 +119,8 @@ const updateContact = async (req, res, next) => {
 
 const updateContactStatus = async (req, res, next) => {
   const { contactId } = req.params;
-  
+
   const { favorite = false } = req.body;
-  
 
   try {
     const result = await service.updateStatus(contactId, { favorite });
