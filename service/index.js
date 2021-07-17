@@ -21,7 +21,6 @@ const update = async (id, data) => {
 };
 
 const updateStatus = async (id, data) => {
-  console.log(data);
   return Contact.findByIdAndUpdate(id, data, { new: true });
 };
 
