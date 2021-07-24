@@ -3,8 +3,9 @@ const logger = require('morgan');
 const cors = require('cors');
 const dotenv = require('dotenv');
 dotenv.config();
+require('./configs/passport-config')
 
-const contactsRouter = require('./routes/api/contacts');
+const api = require('./routes/api');
 
 const app = express();
 
@@ -14,7 +15,8 @@ app.use(logger(formatsLogger));
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/v1/contacts', contactsRouter);
+app.use('/api/v1/contacts', api.contacts);
+app.use('/api/v1/users', api.auth);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' });
