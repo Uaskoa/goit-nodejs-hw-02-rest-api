@@ -7,7 +7,7 @@ const signup = async (req, res, next) => {
   try {
     const result = await service.user.getOne({ email });
     if (result) {
-      return await res.status(409).json({
+      return res.status(409).json({
         status: 'error',
         code: 409,
         message: 'Email in use',
@@ -31,7 +31,7 @@ const login = async (req, res, next) => {
   try {
     const user = await service.user.getOne({ email });
     if (!user || !user.comparePassword(password)) {
-      return await res.status(401).json({
+      return res.status(401).json({
         status: 'error',
         code: 401,
         message: 'Email or password is wrong',
@@ -41,9 +41,9 @@ const login = async (req, res, next) => {
     const { SECRET_KEY } = process.env;
     const payload = { id: user._id };
     const token = jwt.sign(payload, SECRET_KEY);
-    //  await service.user.updateById(user._id, token);
+    await service.user.updateById(user._id, { token });
 
-    await res.status(200).json({
+    res.status(200).json({
       status: 'success',
       code: 200,
       data: {
@@ -60,8 +60,9 @@ const login = async (req, res, next) => {
 };
 
 const logout = async (req, res, next) => {
+  const id = req.user._id;
   try {
-    await service.user.updateById(req.user._id, { token: null });
+    await service.user.updateById(id, { token: null });
     res.status(204).json({
       status: 'success',
       code: 204,

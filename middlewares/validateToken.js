@@ -9,9 +9,9 @@ const validateToken = (req, res, next) => {
         message: 'Not authorized',
       });
     }
-    req.user=user;
-    next()
-  })(req,res,next);
+    req.user = user;
+    next();
+  })(req, res, next);
 };
 
 module.exports = validateToken;

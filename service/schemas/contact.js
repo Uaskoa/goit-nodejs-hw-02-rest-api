@@ -20,8 +20,8 @@ const contactSchema = Schema(
     },
 
     owner: {
-      // type: SchemaTypes.ObjectId,
-      type: Schema.Types.ObjectId,
+      type: SchemaTypes.ObjectId,
+      // type: Schema.Types.ObjectId,
       ref: 'user',
     },
   },
