@@ -5,9 +5,10 @@ const { Contact } = require('./schemas/contact');
 // };
 
 const get = async query => {
+  const { page, limit } = query;
   const options = {
-    page: query.page || 1,
-    limit: query.limit || 20,
+    page: page || 1,
+    limit: limit || 20,
   };
 
   return await Contact.paginate({}, options);
