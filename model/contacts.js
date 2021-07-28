@@ -1,9 +1,8 @@
-const service = require('../service');
+const service = require('../service/');
 
 const listContacts = async (req, res, next) => {
   try {
-    const result = await service.get();
-
+    const result = await service.contact.get(req.query);
     res.json({
       status: 'success',
       code: 200,
@@ -21,7 +20,7 @@ const getContactById = async (req, res, next) => {
   const { contactId } = req.params;
 
   try {
-    const result = await service.getById(contactId);
+    const result = await service.contact.getById(contactId);
     if (!result) {
       return await res.status(404).json({
         status: 'error',
@@ -46,7 +45,7 @@ const removeContact = async (req, res, next) => {
   const { contactId } = req.params;
 
   try {
-    const result = await service.remove(contactId);
+    const result = await service.contact.remove(contactId);
     if (!result) {
       return res.status(404).json({
         status: 'error',
@@ -71,7 +70,7 @@ const removeContact = async (req, res, next) => {
 const addContact = async (req, res, next) => {
   const { body } = req;
   try {
-    const result = await service.add(body);
+    const result = await service.contact.add(body);
     res.status(201).json({
       status: 'success',
       code: 201,
@@ -88,7 +87,7 @@ const updateContact = async (req, res, next) => {
   const { contactId } = req.params;
 
   try {
-    const result = await service.update(contactId, { ...req.body });
+    const result = await service.contact.update(contactId, { ...req.body });
     if (Object.keys(req.body).length === 0) {
       return res.status(400).json({
         status: 'error',
@@ -123,7 +122,7 @@ const updateContactStatus = async (req, res, next) => {
   const { favorite = false } = req.body;
 
   try {
-    const result = await service.updateStatus(contactId, { favorite });
+    const result = await service.contact.updateStatus(contactId, { favorite });
 
     if (Object.keys(req.body).length === 0) {
       return res.status(404).json({
