@@ -14,6 +14,30 @@ const get = async query => {
   return await Contact.paginate({}, options);
 };
 
+// NOT WORKING const get = async query => {
+//   // console.log(query);
+//   const options = {
+//     page: query.page || 1,
+//     limit: query.limit || 20,
+//     favorite: null,
+//   };
+
+//   if (query.favorite !== null) {
+//     options.favorite = query.favorite;
+//   }
+
+//   console.log(options);
+
+//   return await Contact.paginate({}, options, function (err, result) {
+//     if(err) {
+//       console.log(error)
+//     }
+//     console.log(result);
+
+//     console.log(options.favorite);
+//     return result.docs.filter(doc => doc.favorite === options.favorite);
+//   });
+
 const getById = async id => {
   return Contact.findById(id);
 };
