@@ -1,5 +1,9 @@
 const service = require('../service/');
 const jwt = require('jsonwebtoken');
+const path = require('path');
+const fs = require('fs/promises');
+const { v4 } = require('uuid');
+const Jimp = require('jimp');
 require('dotenv').config();
 
 const signup = async (req, res, next) => {
@@ -18,7 +22,11 @@ const signup = async (req, res, next) => {
       status: 'success',
       code: 201,
       data: {
-        user: { email: newUser.email, subscription: newUser.subscription },
+        user: {
+          email: newUser.email,
+          subscription: newUser.subscription,
+          avatarURL: newUser.avatarURL,
+        },
       },
     });
   } catch (error) {
@@ -85,9 +93,98 @@ const getUser = async (req, res, next) => {
   });
 };
 
+const updateAvatar = async (req, res, next) => {
+  const { path: tempName, originalname } = req.file;
+
+  try {
+    const image = await Jimp.read(tempName);
+
+    await image.resize(256, 256).write(tempName);
+  } catch (error) {
+    console.log(error);
+  }
+
+  const uploadDir = path.join(process.cwd(), 'public/avatars');
+  const { id, avatarURL } = req.user;
+  const userDirectory = path.join(uploadDir, id);
+
+  try {
+    const avatarId = v4();
+    await fs.mkdir(userDirectory);
+
+    const fileName = path.join(userDirectory, `${avatarId}_${originalname}`);
+
+    fs.rename(tempName, fileName);
+
+    await service.user.updateById(id, { avatarURL: fileName });
+
+    res.status(200).json({
+      status: 'success',
+      code: 200,
+      data: {
+        avatarURL,
+      },
+    });
+  } catch (error) {
+    fs.unlink(tempName);
+    next(error);
+  }
+};
+
+// const updateAvatar = async (req, res, next) => {
+//   const { path: tempName, originalname } = req.file;
+//   // console.log(req.file.path); // new temp path avatar
+
+//   try {
+//     const image = await Jimp.read(tempName);
+
+//     await image.resize(256, 256).write(tempName);
+//   } catch (error) {
+//     console.log(error);
+//     // next(error)
+//   }
+
+//   const uploadDir = path.join(process.cwd(), 'public/avatars');
+//   const { id, avatarURL } = req.user;
+//   const userDirectory = path.join(uploadDir, id);
+
+//      const oldAvatarURL = req.user.avatarURL; // path старого аватара
+//      if (userDirectory.includes(oldAvatarURL)) {
+//        await fs.unlink(oldAvatarURL);
+//      }
+
+//   try {
+//     const avatarId = v4();
+//     await fs.mkdir(userDirectory);
+
+//     const fileName = path.join(userDirectory, `${avatarId}_${originalname}`);
+
+//     await fs.rename(tempName, fileName);
+
+//     await service.user.updateById(id, { avatarURL: fileName });
+
+//        if (userDirectory.includes(oldAvatarURL)) {
+//          await fs.unlink(oldAvatarURL);
+//          return fileName;
+//        }
+
+//     res.status(200).json({
+//       status: 'success',
+//       code: 200,
+//       data: {
+//         avatarURL,
+//       },
+//     });
+//   } catch (error) {
+//     fs.unlink(tempName);
+//     next(error);
+//   }
+// };
+
 module.exports = {
   signup,
   login,
   logout,
   getUser,
+  updateAvatar,
 };

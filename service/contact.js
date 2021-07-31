@@ -14,7 +14,6 @@ const get = async query => {
   return await Contact.paginate({}, options);
 };
 
-
 const getById = async id => {
   return Contact.findById(id);
 };

@@ -3,15 +3,20 @@ const bcrypt = require('bcryptjs');
 const Joi = require('joi');
 
 const userSchema = Schema({
-  password: {
-    type: String,
-    required: [true, 'Password is required'],
-  },
   email: {
     type: String,
     required: [true, 'Email is required'],
     unique: true,
   },
+  password: {
+    type: String,
+    required: [true, 'Password is required'],
+  },
+  avatarURL: {
+    type: String,
+    required: [true, 'Avatar is required'],
+  },
+
   subscription: {
     type: String,
     enum: ['starter', 'pro', 'business'],
