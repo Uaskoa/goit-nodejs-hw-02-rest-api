@@ -94,44 +94,6 @@ const getUser = async (req, res, next) => {
   });
 };
 
-// const updateAvatar = async (req, res, next) => {
-//   const { path: tempName, originalname } = req.file;
-
-//   try {
-//     const image = await Jimp.read(tempName);
-
-//     await image.resize(256, 256).write(tempName);
-//   } catch (error) {
-//     console.log(error);
-//   }
-
-//   const uploadDir = path.join(process.cwd(), 'public/avatars');
-//   const { id, avatarURL } = req.user;
-//   const userDirectory = path.join(uploadDir, id);
-
-//   try {
-//     const avatarId = v4();
-//     await fs.mkdir(userDirectory);
-
-//     const fileName = path.join(userDirectory, `${avatarId}_${originalname}`);
-
-//     fs.rename(tempName, fileName);
-
-//     await service.user.updateById(id, { avatarURL: fileName });
-
-//     res.status(200).json({
-//       status: 'success',
-//       code: 200,
-//       data: {
-//         avatarURL,
-//       },
-//     });
-//   } catch (error) {
-//     fs.unlink(tempName);
-//     next(error);
-//   }
-// };
-
 const updateAvatar = async (req, res, next) => {
   const { id, avatarURL } = req.user;
   const avatarId = v4();
@@ -153,23 +115,19 @@ const updateAvatar = async (req, res, next) => {
   }
 
   async function saveImage() {
-    try {
-      await fsAsync.rename(tempName, fileName);
-    } catch (error) {
-      console.log(error.message);
-    }
+    await fsAsync.rename(tempName, fileName);
   }
 
   async function removeAvatar() {
     if (fs.existsSync(avatarURL)) {
       await fsAsync.unlink(avatarURL);
-      saveImage();
     }
   }
 
   createDir();
   await prepareAvatar();
-  removeAvatar();
+  await removeAvatar();
+  await saveImage();
 
   try {
     await service.user.updateById(id, { avatarURL: fileName });
