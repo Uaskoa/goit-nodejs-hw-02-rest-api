@@ -141,30 +141,36 @@ const updateAvatar = async (req, res, next) => {
   const newNameAvatar = `${avatarId}_${originalname}`;
   const fileName = path.join(userDirectory, newNameAvatar);
 
-  function createDir() {
+  async function createDir() {
     if (!fs.existsSync(userDirectory)) {
-      fsAsync.mkdir(userDirectory);
+      await fsAsync.mkdir(userDirectory);
     }
   }
 
   async function prepareAvatar() {
     const image = await Jimp.read(tempName);
     await image.resize(256, 256).write(tempName);
-    saveImage();
   }
 
   async function saveImage() {
-    return await fsAsync.rename(tempName, fileName);
+    try {
+      await fsAsync.rename(tempName, fileName);
+    } catch (error) {
+      console.log(error.message);
+    }
   }
 
   async function removeAvatar() {
     if (fs.existsSync(avatarURL)) {
       await fsAsync.unlink(avatarURL);
+      saveImage();
     }
   }
+
   createDir();
-  prepareAvatar();
+  await prepareAvatar();
   removeAvatar();
+
   try {
     await service.user.updateById(id, { avatarURL: fileName });
 
