@@ -16,6 +16,7 @@ const jwtStrategy = new Strategy(settings, async (payload, done) => {
     if (!user) {
       throw new Error('Not Found');
     }
+    
     done(null, user);
   } catch (error) {
     done(error);
