@@ -1,8 +1,7 @@
 const service = require('../service/');
 const jwt = require('jsonwebtoken');
 const path = require('path');
-const fsAsync = require('fs/promises');
-const fs = require('fs');
+const fs = require('fs/promises');
 const { v4 } = require('uuid');
 const Jimp = require('jimp');
 require('dotenv').config();
@@ -95,6 +94,26 @@ const getUser = async (req, res, next) => {
 };
 
 const updateAvatar = async (req, res, next) => {
+  const { id } = req.user;
+  const { user, file } = req;
+  const avatarURL = await saveAvatar({ user, file });
+
+  try {
+    await service.user.updateById(id, { avatarURL });
+
+    res.status(200).json({
+      status: 'success',
+      code: 200,
+      data: {
+        avatarURL,
+      },
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const saveAvatar = async (req, res, next) => {
   const { id, avatarURL } = req.user;
   const avatarId = v4();
   const { path: tempName, originalname } = req.file;
@@ -102,48 +121,91 @@ const updateAvatar = async (req, res, next) => {
   const userDirectory = path.join(uploadDir, id);
   const newNameAvatar = `${avatarId}_${originalname}`;
   const fileName = path.join(userDirectory, newNameAvatar);
+  const image = await Jimp.read(tempName);
 
-  async function createDir() {
-    if (!fs.existsSync(userDirectory)) {
-      await fsAsync.mkdir(userDirectory);
+  const isAccessible = path => {
+    return fs
+      .access(path)
+      .then(() => true)
+      .catch(() => false);
+  };
+
+  const createDir = async path => {
+    if (!(await isAccessible(path))) {
+      await fs.mkdir(path);
     }
-  }
+  };
 
-  async function prepareAvatar() {
-    const image = await Jimp.read(tempName);
-    await image.resize(256, 256).write(tempName);
-  }
-
-  async function saveImage() {
-    await fsAsync.rename(tempName, fileName);
-  }
-
-  async function removeAvatar() {
-    if (fs.existsSync(avatarURL)) {
-      await fsAsync.unlink(avatarURL);
+  const removeAvatar = async path => {
+    if (await isAccessible(path)) {
+      await fs.unlink(path);
     }
-  }
-
-  createDir();
-  await prepareAvatar();
-  await removeAvatar();
-  await saveImage();
+  };
 
   try {
-    await service.user.updateById(id, { avatarURL: fileName });
+    await createDir(userDirectory);
 
-    res.status(200).json({
-      status: 'success',
-      code: 200,
-      data: {
-        avatarURL: fileName,
-      },
-    });
+    await image.resize(256, 256).write(fileName);
+    await fs.unlink(tempName);
+    await removeAvatar(avatarURL);
+
+    return fileName;
   } catch (error) {
-    fsAsync.unlink(tempName);
-    next(error);
+    console.log(error);
+    next();
   }
 };
+
+// const updateAvatar = async (req, res, next) => {
+//   const { id, avatarURL } = req.user;
+//   const avatarId = v4();
+//   const { path: tempName, originalname } = req.file;
+//   const uploadDir = path.join(process.cwd(), 'public/avatars');
+//   const userDirectory = path.join(uploadDir, id);
+//   const newNameAvatar = `${avatarId}_${originalname}`;
+//   const fileName = path.join(userDirectory, newNameAvatar);
+
+//   async function createDir() {
+//     if (!fs.existsSync(userDirectory)) {
+//       await fsAsync.mkdir(userDirectory);
+//     }
+//   }
+
+//   async function prepareAvatar() {
+//     const image = await Jimp.read(tempName);
+//     await image.resize(256, 256).write(tempName);
+//   }
+
+//   async function saveImage() {
+//     await fsAsync.rename(tempName, fileName);
+//   }
+
+//   async function removeAvatar() {
+//     if (fs.existsSync(avatarURL)) {
+//       await fsAsync.unlink(avatarURL);
+//     }
+//   }
+
+//   createDir();
+//   await prepareAvatar();
+//   await removeAvatar();
+//   await saveImage();
+
+//   try {
+//     await service.user.updateById(id, { avatarURL: fileName });
+
+//     res.status(200).json({
+//       status: 'success',
+//       code: 200,
+//       data: {
+//         avatarURL: fileName,
+//       },
+//     });
+//   } catch (error) {
+//     fsAsync.unlink(tempName);
+//     next(error);
+//   }
+// };
 
 module.exports = {
   signup,
