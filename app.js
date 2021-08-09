@@ -18,7 +18,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use('/api/v1/contacts', api.contacts);
-app.use('/api/v1/users', api.auth);
+app.use('/api/v1/users', api.users);
 
 app.use((req, res) => {
   res.status(404).json({ message: 'Not found' });
