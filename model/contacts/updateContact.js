@@ -4,7 +4,11 @@ const updateContact = async (req, res, next) => {
   const { contactId } = req.params;
 
   try {
-    const result = await service.contact.update(contactId, { ...req.body });
+    const result = await service.contact.update(contactId, {
+      ...req.body,
+      owner: req.user.id,
+    });
+
     if (Object.keys(req.body).length === 0) {
       return res.status(400).json({
         status: 'error',

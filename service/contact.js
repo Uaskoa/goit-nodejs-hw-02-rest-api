@@ -4,14 +4,20 @@ const { Contact } = require('./schemas/contact');
 //   return Contact.find();
 // };
 
-const get = async query => {
-  const { page, limit } = query;
+const get = async (query, userId) => {
+  const { page, limit, favorite } = query;
+  console.log(userId);
   const options = {
     page: page || 1,
     limit: limit || 20,
   };
 
-  return await Contact.paginate({}, options);
+  const queryList = { owner: userId };
+  if (favorite) {
+    queryList.favorite = favorite;
+  }
+
+  return await Contact.paginate(queryList, options);
 };
 
 const getById = async id => {
@@ -27,10 +33,6 @@ const remove = async id => {
 };
 
 const update = async (id, data) => {
-  return Contact.findByIdAndUpdate(id, data);
-};
-
-const updateStatus = async (id, data) => {
   return Contact.findByIdAndUpdate(id, data, { new: true });
 };
 
@@ -40,5 +42,4 @@ module.exports = {
   add,
   remove,
   update,
-  updateStatus,
 };

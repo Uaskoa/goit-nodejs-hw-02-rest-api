@@ -18,7 +18,7 @@ const add = async ({ email, password, verifyToken }) => {
 };
 
 const updateById = async (id, updateInfo) => {
-  return User.findByIdAndUpdate(id, updateInfo);
+  return User.findByIdAndUpdate(id, updateInfo, { new: true, runValidators: true });
 };
 
 module.exports = {

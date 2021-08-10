@@ -6,7 +6,7 @@ const updateContactStatus = async (req, res, next) => {
   const { favorite = false } = req.body;
 
   try {
-    const result = await service.contact.updateStatus(contactId, { favorite });
+    const result = await service.contact.update(contactId, { favorite });
 
     if (Object.keys(req.body).length === 0) {
       return res.status(404).json({

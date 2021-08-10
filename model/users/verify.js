@@ -2,7 +2,7 @@ const service = require('../../service');
 
 const verify = async (req, res, next) => {
   const { verificationToken } = req.params;
-
+ 
   try {
     const user = await service.user.getOne({ verifyToken: verificationToken });
 
@@ -15,7 +15,7 @@ const verify = async (req, res, next) => {
     }
     await service.user.updateById(user._id, {
       verify: true,
-      verifyToken: null,
+      verifyToken: ' ',
     });
     res.status(200).json({
       status: 'success',

@@ -13,6 +13,8 @@ router.get('/current', validateToken, ctrl.getUser);
 
 router.post('/logout', validateToken, ctrl.logout);
 
+router.patch('/', validateToken, ctrl.updateSubscription);
+
 router.patch(
   '/avatars',
   validateToken,

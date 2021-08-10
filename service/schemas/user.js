@@ -69,6 +69,7 @@ userSchema.methods.comparePassword = function (password) {
 const User = model('user', userSchema);
 
 module.exports = {
+  userSchema,
   User,
   userValidateMiddleware,
 };
